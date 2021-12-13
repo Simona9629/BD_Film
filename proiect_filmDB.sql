@@ -1,7 +1,9 @@
+-- crearea bazei de date
 CREATE DATABASE filmDB;
 USE filmDB;
-DROP DATABASE filmDB;
+-- DROP DATABASE filmDB;
 
+-- creare tabele
 CREATE TABLE utilizator(
 	id INT(6) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nume VARCHAR(100) NOT NULL,
@@ -60,6 +62,7 @@ CREATE TABLE membru_productie(
     FOREIGN KEY (id_membru) REFERENCES membru(id)
 );
 
+-- modificarea structurii tabelelor
 ALTER TABLE review
 ADD COLUMN id_utilizator INT(6) NOT NULL;
 
@@ -82,6 +85,7 @@ CHANGE descriere comentariu TEXT;
 
 ALTER TABLE membru AUTO_INCREMENT = 10;
 
+-- adaugarea inregistrarilor
 INSERT INTO membru 
 VALUES
 (NULL, 'Franck', 'Darabont', 'director', '1959-01-28', 'Frank Darabont este un regizor și producător maghiaro-american care a fost nominalizat la 
@@ -213,6 +217,8 @@ VALUES
 (true, 5, 7), (true, 6, 8), (true, 6, 9), (true, 6, 10), (true, 7, 11), (NULL, 8, 12), (true, 8, 5), (NULL, 8, 13), (NULL, 8, 14),
 (NULL, 8, 15), (NULL, 10, 16), (NULL, 10, 17), (NULL, 10, 15), (true, 10, 13);
 
+
+-- actualizarea date
 UPDATE actor 
 SET data_nasterii = '1978-02-12', locul_nasterii = 'Londra'
 WHERE id = 16;
@@ -227,6 +233,7 @@ UPDATE review
 SET titlu_review = 'Un miniserial de neratat'
 WHERE id = 9;
 
+-- stergere date
 DELETE FROM membru_productie
 WHERE id_productie = 4;
 
@@ -236,117 +243,11 @@ WHERE rating = 3;
 DELETE FROM productie_actor
 WHERE id_actor = 17;
 
-SELECT * FROM productie;
-SELECT * FROM membru;
-SELECT * FROM actor;
-SELECT * FROM utilizator;
-SELECT * FROM review;
-SELECT * FROM membru_productie;
-SELECT * FROM productie_actor;
-
-SELECT * FROM productie
-WHERE tip = 'film';
-
-SELECT titlu, gen, storyline,sezoane
-FROM productie
-WHERE tip = 'serial';
-
-SELECT * FROM actor
-WHERE biografie IS NOT NULL;
-
-SELECT * FROM membru
-WHERE YEAR(data_nasterii) BETWEEN 1950 AND 1970;
-
-SELECT titlu,gen FROM productie
-WHERE gen LIKE '%drama%';
-
-SELECT * FROM actor
-WHERE YEAR(data_nasterii) = (SELECT YEAR(data_nasterii) FROM actor WHERE nume = 'DiCaprio' AND prenume = 'Leonardo Wilhelm');
-
-SELECT titlu, tip, storyline FROM productie
-WHERE MONTH(data_aparitie) = (SELECT MONTH(data_aparitie) FROM productie WHERE titlu = 'The Shawshank Redemption');
-
-SELECT rating, comentariu, id_productie FROM review
-WHERE rating > (SELECT rating FROM review WHERE id_utilizator = 7)
-ORDER BY id_productie;
-
-SELECT CONCAT(prenume, ' ', nume) nume, biografie FROM membru
-WHERE (rol, MONTH(data_nasterii)) = (SELECT rol, MONTH(data_nasterii) FROM membru WHERE nume = 'Nolan' AND prenume = 'Christopher Edward');
-
-SELECT tip, GROUP_CONCAT(titlu SEPARATOR '*') productie
-FROM productie
-GROUP BY tip;
-
-SELECT rol, GROUP_CONCAT(CONCAT(prenume, ' ', nume)) membru
-FROM membru
-GROUP BY rol;
-
 INSERT INTO productie
 VALUES
 (NULL, 'The Social Network', '2010-10-01', 'film', 'biografic', NULL, NULL),
 (NULL, 'Tangled', '2010-11-24', 'film', 'animatie', NULL, NULL);
 
-SELECT * FROM productie;
-
-SELECT YEAR(data_aparitie) an, COUNT(*) numar_productii
-FROM productie
-GROUP BY an
-HAVING numar_productii >= 2;
-
-SELECT rating, titlu_review, comentariu, nume utilizator
-FROM review JOIN utilizator
-ON utilizator.id = review.id_utilizator;
-
-SELECT rating, comentariu, titlu
-FROM review JOIN productie
-ON review.id_productie = productie.id;
-
-SELECT CONCAT(prenume, ' ', nume) actor
-FROM actor LEFT JOIN productie_actor
-ON actor.id = productie_actor.id_actor
-WHERE rol_principal IS NOT NULL;
-
-SELECT titlu, CONCAT(prenume, ' ', nume) actor
-FROM productie JOIN productie_actor ON productie.id = productie_actor.id_productie
-JOIN actor ON productie_actor.id_actor = actor.id;
-
-SELECT titlu, GROUP_CONCAT(CONCAT(prenume, ' ', nume)) cast
-FROM productie JOIN productie_actor ON productie.id = productie_actor.id_productie
-JOIN actor ON productie_actor.id_actor = actor.id
-GROUP BY titlu;
-
-SELECT CONCAT(prenume, ' ', nume) actor, GROUP_CONCAT(titlu) productii
-FROM productie JOIN productie_actor ON productie.id = productie_actor.id_productie
-JOIN actor ON productie_actor.id_actor = actor.id
-GROUP BY actor;
-
-SELECT CONCAT(prenume, ' ', nume) protagonist, GROUP_CONCAT(titlu) productii
-FROM productie JOIN productie_actor ON productie.id = productie_actor.id_productie
-JOIN actor ON productie_actor.id_actor = actor.id
-WHERE rol_principal IS NOT NULL
-GROUP BY protagonist;
-
-SELECT titlu, CONCAT(prenume, ' ', nume) membru, rol
-FROM productie JOIN membru_productie ON productie.id = membru_productie.id_productie
-JOIN membru on membru.id = membru_productie.id_membru;
-
-SELECT titlu, CONCAT(prenume, ' ', nume) membru, rol
-FROM membru_productie JOIN (SELECT * FROM productie WHERE tip = 'film') film ON film.id = membru_productie.id_productie
-JOIN membru on membru.id = membru_productie.id_membru;
-
-SELECT titlu, CONCAT(prenume, ' ', nume) membru, rol
-FROM membru_productie JOIN (SELECT * FROM productie WHERE tip = 'serial') serial ON serial.id = membru_productie.id_productie
-JOIN (SELECT * FROM membru WHERE rol = 'creator') creator on creator.id = membru_productie.id_membru;
-
-SELECT rating, comentariu, titlu, nume utilizator
-FROM review JOIN productie ON review.id_productie = productie.id
-JOIN utilizator ON review.id_utilizator = utilizator.id;
-
-SELECT AVG(rating) rating_film, titlu, COUNT(*) numar_reviewuri
-FROM review JOIN productie ON review.id_productie = productie.id
-JOIN utilizator ON review.id_utilizator = utilizator.id
-GROUP BY titlu
-HAVING numar_reviewuri >= 2;
 
 
 
