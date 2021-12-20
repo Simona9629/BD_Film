@@ -258,3 +258,4 @@ END;
 DELIMITER ;
 
 SELECT productii_actor(5);
+
